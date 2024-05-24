@@ -52,3 +52,5 @@ const testInputs =
     "msg": "Hey Jon! It’s pretty sunny here"
   },
 ]
+
+console.log('Script Loaded!!')
