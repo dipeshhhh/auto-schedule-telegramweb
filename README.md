@@ -21,7 +21,7 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
   {"hh":"01", "mm":"00", "msg":"Good Morning, it is currently 1:00AM 🕐"},
   {"hh":"12", "mm":"00", "msg":"Good Afternoon, it is currently 12:00PM 🕛"},
   {"hh":"17", "mm":"00", "msg":"Good Evening, it is currently 5:00PM 🕔"},
-  {"hh":"22", "mm":"00", "msg":"Good Evening, it is currently 10:00PM 🕙"}
+  {"hh":"22", "mm":"00", "msg":"Good Night, it is currently 10:00PM 🕙"}
 ]
 ```
 ```js
