@@ -64,7 +64,7 @@ async function main() {
     }
   };
 
-  async function lessgo(messages) {
+  async function initiateMsgSending(messages) {
     const activeChat = document.querySelector('.chat.tabs-tab.active');
     if (!activeChat) {
       console.error("Make sure you are on Telegram web first");
@@ -88,14 +88,14 @@ async function main() {
     const timeSeparator = [':', ';', ',', '.'].find(sep => minInp.includes(sep));
     if (!timeSeparator) {
       alert('Please enter the time in the correct format!');
-      return lessgo();
+      return initiateMsgSending();
     }
 
     const [fromHr, fromMin] = minInp.split(timeSeparator).map(part => parseInt(part, 10));
 
     if (isNaN(fromHr) || isNaN(fromMin) || fromHr < 0 || fromHr > 23 || fromMin < 0 || fromMin > 59) {
       alert('Please enter the time in the correct format!');
-      return lessgo();
+      return initiateMsgSending();
     }
 
     await autoSend(messages, fromHr, fromMin);
@@ -155,7 +155,7 @@ async function main() {
   }
   document.addEventListener('keydown', haltExecution);
 
-  if (isDataCorrect(testInputs)) lessgo(testInputs);
+  if (isDataCorrect(testInputs)) initiateMsgSending(testInputs);
 }
 
 main();
