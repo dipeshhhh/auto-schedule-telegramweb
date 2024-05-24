@@ -67,12 +67,13 @@ async function main() {
   async function initiateMsgSending(messages) {
     const activeChat = document.querySelector('.chat.tabs-tab.active');
     if (!activeChat) {
-      console.error("Make sure you are on Telegram web first");
+      alert("Open a Telegram web chat first!")
+      console.error("Make sure you are on Telegram web first!");
       return;
     }
 
     if (activeChat.getAttribute('data-type') !== 'scheduled') {
-      alert('Open the schedule messages section of chat first!');
+      alert('Open the schedule messages section of a chat first!');
       return;
     }
 
