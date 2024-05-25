@@ -42,7 +42,7 @@ async function main() {
 
     for (const { hh, mm, msg } of messages) {
       if (!continueExecution) {
-        console.log('Execution stopped by user on message: ', {'hh':hh,'mm':mm,'msg':msg});
+        console.log('Execution stopped by user on message: ', { 'hh': hh, 'mm': mm, 'msg': msg });
         document.removeEventListener('keydown', haltExecution);
         return;
       }
@@ -131,17 +131,15 @@ async function main() {
   }
 
   const testInputs = [
-    { hh: "22", mm: "5", msg: "Heyy Jon, welcome back" },
-    { hh: "22", mm: "1", msg: "Hey Jon! It’s pretty sunny here" },
-    { hh: "22", mm: "1", msg: "H124ey Jon! It’s pretty sunny here" },
-    { hh: "22", mm: "01", msg: "Hey1521 Jon! It’s pretty sunny here" },
-    { hh: "22", mm: "10", msg: "Hey Jo155n! It’s pretty sunnyasf here" },
-    { hh: "22", mm: "12", msg: "Hey J15115on! It’s pretty sunny heffre" },
-    { hh: "22", mm: "21", msg: "He511y J15115o1n! It’s pretty sunny here" },
-    { hh: "22", mm: "1", msg: "He1y J15115215on! It’s pretty sunny here" },
-    { hh: "22", mm: "53", msg: "He1y qwrqJ15115215on! It’s pretty sunny here" },
-    { hh: "22", mm: "6", msg: "sdgsdHe1y J15115215on! It’s pretty sunny here" },
-    { hh: "22", mm: "15", msg: "He1y J15115215on! It’s pretty sun25ny here" },
+    { "hh": "01", "mm": "00", "msg": "Good Morning, it is currently 1:00AM 🕐" },
+    { "hh": "01", "mm": "30", "msg": "Still Good Morning, it is currently 1:30AM 🕜" },
+    { "hh": "12", "mm": "00", "msg": "Good Afternoon, it is currently 12:00PM 🕛" },
+    { "hh": "12", "mm": "30", "msg": "It is still Afternoon, it is currently 12:30PM 🕧" },
+    { "hh": "17", "mm": "00", "msg": "Good Evening, it is currently 5:00PM 🕔" },
+    { "hh": "19", "mm": "30", "msg": "Again, still Good Evening, it is currently 7:30PM 🕢" },
+    { "hh": "22", "mm": "00", "msg": "Good Night, it is currently 10:00PM 🕙" },
+    { "hh": "23", "mm": "59", "msg": "Still Good Night as well, it is currently 11:59PM 🕛" },
+    { "hh": "00", "mm": "00", "msg": "Still Good Night as well, it is currently 12:00PM 🕛" },
   ];
 
   // Flag for stopping execution
