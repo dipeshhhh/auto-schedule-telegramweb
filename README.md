@@ -16,6 +16,7 @@ Manually entering messages and times for scheduling a bulk of similar messages d
 ### Solution
 This project provides a bookmarklet for quickly automating the bulk scheduling of messages on Telegram Web.
 - You can now create a JSON dataset for your messages and timings in the following format:
+#### JSON file example.
 ```json
 [
   {"hh":"01", "mm":"00", "msg":"Good Morning, it is currently 1:00AM 🕐"},
@@ -27,18 +28,18 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
 ```js
 //... Add more accordingly
 ```
-- Then replace the 'testInputs' inside the code with your dataset and follow the steps for [Installation](#installation) and [Execution](#execution).
+- Then use this dataset in the Auto Schedule Telegram bookmarklet. Follow the steps for [Installation](#installation) and [Execution](#execution).
 
 ## Features
 - Automatically schedules messages based on the provided dataset.
 - Press <b>ALT+X</b> to stop the execution at any time.
 - Flexible time input options.
-- User-friendly prompts for starting and stopping the script.
 - Start scheduling from any given time/row (hh,mm) in your dataset.
+- Edit message set before scheduling.
 
 ## Getting Started
 ### Preparation
-1. Update the 'testInputs' data according to your needs.
+1. Create a JSON file containing your message data set in the format shown [above](#json-file-example).
 2. Minify the code using any js minifier. 
 
 ### Installation
@@ -46,12 +47,15 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
 2. Create a new bookmark in your browser.
 3. Edit the bookmark and replace the URL in the following format:
 <pre>javascript:<i><b>your_minified_code_here</b></i></pre>
-4. Save the bookmark.
+4. Save the bookmark with any name of your choice.
 
 ### Execution
 1. Open scheduled messages section of any telegram web chat.
 2. Click on your saved bookmark.
-3. Carefully read and follow along the instructions that pop-up as alerts.
+3. Upload your JSON file by selecting 'Upload new set' in 'Select message set'.
+4. Adjust 'From' time input according to your needs.
+5. Preview/Edit your dataset.
+6. Click confirm.
 - <pre><i>Press</i> <b>ALT+X</b> <i>to stop the execution at any time.</i></pre>
 
 ## Current limitations
