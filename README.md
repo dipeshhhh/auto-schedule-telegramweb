@@ -1,4 +1,4 @@
-# Telegram Web Schedule Message Automation Bookmarklet
+# Telegram-Web Schedule Message Automation Bookmarklet
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -61,13 +61,14 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
 ## Current limitations
 - Only works for K version of telegram web.
 - Only works for Desktops/Laptops.
-- Can schedule messages for current day only, i.e. cannot change the date.
 - Code relies on a sleep function.
 - Scheduling is limited by your Telegram account's scheduled message quota (default 100 messages per chat at a time).
 
 ## Future features
+- Scheduling messages for different dates.
 - Remote dataset support.
 - Spreadsheet dataset support.
+- Handling current limitations.
 
 ## Contributions
 Contributions and bug reports are welcome! If you have suggestions for improvements or have found a bug, please create an issue or pull request on this repository.
