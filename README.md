@@ -4,10 +4,11 @@
 1. [Overview](#overview)
 2. [Features](#features)
 3. [Getting Started](#getting-started)
-4. [Current Limitations](#current-limitations)
-5. [Future Features](#future-features)
-6. [Contributions](#contributions)
-7. [License](#license)
+4. [For Developers](#for-developers)
+5. [Current Limitations](#current-limitations)
+6. [Future Features](#future-features)
+7. [Contributions](#contributions)
+8. [License](#license)
 
 ## Overview
 ### Problem
@@ -19,10 +20,10 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
 #### JSON file example.
 ```json
 [
-  {"hh":"01", "mm":"00", "msg":"Good Morning, it is currently 1:00AM 🕐"},
-  {"hh":"12", "mm":"00", "msg":"Good Afternoon, it is currently 12:00PM 🕛"},
-  {"hh":"17", "mm":"00", "msg":"Good Evening, it is currently 5:00PM 🕔"},
-  {"hh":"22", "mm":"00", "msg":"Good Night, it is currently 10:00PM 🕙"}
+  {"hh":"01", "mm":"00", "txt":"Good Morning, it is currently 1:00AM 🕐"},
+  {"hh":"12", "mm":"00", "txt":"Good Afternoon, it is currently 12:00PM 🕛"},
+  {"hh":"17", "mm":"00", "txt":"Good Evening, it is currently 5:00PM 🕔"},
+  {"hh":"22", "mm":"00", "txt":"Good Night, it is currently 10:00PM 🕙"}
 ]
 ```
 ```js
@@ -40,7 +41,7 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
 ## Getting Started
 ### Preparation
 1. Create a JSON file containing your message data set in the format shown [above](#json-file-example).
-2. Minify the code using any js minifier. 
+2. Minify the code in "dist/script.js" using any js minifier.
 
 ### Installation
 1. First [prepare your code (follow steps given in preparation)](#preparation).
@@ -57,6 +58,13 @@ This project provides a bookmarklet for quickly automating the bulk scheduling o
 5. Preview/Edit your dataset.
 6. Click confirm.
 - <pre><i>Press</i> <b>ALT+X</b> <i>to stop the execution at any time.</i></pre>
+
+## For Developers
+1. Make sure you have node.js installed.
+2. Install required dependencies: <pre>npm install</pre>
+3. Run watch mode using: <pre>npm start</pre> or <pre>tsc -w</pre>
+4. Now edit/write TypeScript code in "src" folder.
+5. The JavaScript code can be found in "dist" folder.
 
 ## Current limitations
 - Only works for K version of telegram web.
