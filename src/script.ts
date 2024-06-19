@@ -1,43 +1,24 @@
-async function main() {
+async function main(): Promise<void> {
   //==================== Telegram elements functions ====================
-  /**
-   * Use: Change the .innerText property of all tags here to enter message in telegram. 
-   * @returns {HTMLElement[]} - The array of HTML elements containing input tags for writing text message in, or an empty array if none are found.
-   */
-  function getTeleMsgInputElements() {
-    return [...document.getElementsByClassName('input-message-input')];
+  function getTeleMsgInputElements(): HTMLElement[] {
+    return [...document.getElementsByClassName('input-message-input') as HTMLCollectionOf<HTMLElement>];
   }
 
-  /**
-   * Use: Check if telegram's schedule message popup which takes time input is active or not.  
-   * @returns {HTMLElement | null} - Telegram's shedule message popup, or 'null' if not found.
-   */
-  function getTeleSchedulerPopupElement() {
-    return document.querySelector('.popup.popup-date-picker.popup-schedule.active');
+  function getTeleSchedulerPopupElement(): HTMLElement | null {
+    return document.querySelector('.popup.popup-date-picker.popup-schedule.active') as HTMLElement || null;
   }
 
-  /**
-   * Use: to check if telegram web is opened or not.
-   * @returns {HTMLElement | null} - Active chat div, or 'null' if not found.
-   */
-  function getTeleActiveChatElement() {
-    return document.querySelector('.chat.tabs-tab.active');
+  function getTeleActiveChatElement(): HTMLElement | null {
+    return document.querySelector('.chat.tabs-tab.active') as HTMLElement || null;
   }
 
-  /**
-   * Checks if telegram chat's schedule messages section is open or not. 
-   * @returns {boolean} - true if open, else false.
-   */
-  function isTeleScheduleChatSectionOpen() {
+  function isTeleScheduleChatSectionOpen(): boolean {
     return getTeleActiveChatElement()?.getAttribute('data-type') === 'scheduled';
   }
 
   //==================== AST elements functions ====================
   //-------------------- Independent functions (no predefined values required) --------------------
-  /**
-   * Creates required HTML elements and appends it to the DOM.
-   */
-  function loadAstPopupIntoDom() {
+  function loadAstPopupIntoDom(): void {
     const astBackdrop = document.createElement('div');
     astBackdrop.id = 'ast-backdrop';
 
@@ -333,50 +314,29 @@ async function main() {
     document.body.append(astBackdrop, astPopup, astFileInput);
   }
 
-  /**
-   * Use: to check if ast-popup is already loaded in DOM or not.
-   * @returns {HTMLElement | null} - ast-popup div or 'null' if not found.
-   */
-  function getAstPopup() {
+  function getAstPopup(): HTMLElement | null {
     return document.getElementById('ast-popup');
   }
 
-  /**
-   * Display HTML tag and message inside the tag.
-   * @param {HTMLElement} htmlElement - HTML tag to show the message inside.
-   * @param {string} message - The message.
-   */
-  function showMessage(htmlElement, message) {
+  function showMessage(htmlElement: HTMLElement, message: string): void {
     htmlElement.style.display = 'initial';
     htmlElement.innerText = message;
   }
 
-  /**
-   * Hides HTML tag and innerText of the tag.
-   * @param {HTMLElement} htmlElement - HTML tag to hide.
-   */
-  function hideMessage(htmlElement) {
+  function hideMessage(htmlElement: HTMLElement): void {
     htmlElement.style.display = 'none';
     htmlElement.innerText = '';
   }
 
-  /**
-   * Generates warning message for old/late messages.
-   * @param {string[] | number[]} oldMsgsRows - Array of row numbers.
-   * @returns {string} - Generated warning message for late/old messages.
-   */
-  function generateOldMsgsWarning(oldMsgsRows) {
+  function generateOldMsgsWarning(oldMsgsRows: (string | number)[]): string {
     const isSingleRow = oldMsgsRows.length === 1;
     return `Warning: Old ${isSingleRow ? 'message' : 'messages'} in the following ${isSingleRow ? 'row' : 'rows'} won't be scheduled - ${oldMsgsRows}`;
   }
 
   //-------------------- Opening and Closing AST popup with backdrop --------------------
-  /**
-   * Hides the ast popup and backdrop while triggering their transitions.
-   * Also sets timout of 150ms to hide popup and backdrop after transition is complete.
-   ** Ensure 'backdrop' and 'popup' elements are defined before calling this function.
-   */
-  function hideAstPopup() {
+  //* Ensure 'backdrop' and 'popup' elements are defined before calling this function.
+  function hideAstPopup(): void {
+    if (!backdrop || !popup) return;
     document.removeEventListener('keydown', hideAstPopupOnAltX);
     document.removeEventListener('pointerdown', hideAstPopupOnOutsideClick);
 
@@ -395,11 +355,9 @@ async function main() {
     }, 150); // 150ms is the transition time set in css (0.15s).
   }
 
-  /**
-   * Displays the ast popup and backdrop while triggering their transitions.
-   ** Ensure 'backdrop' and 'popup' elements are defined before calling this function.
-   */
-  async function showAstPopup() {
+  //* Ensure 'backdrop' and 'popup' elements are defined before calling this function.
+  async function showAstPopup(): Promise<void> {
+    if (!backdrop || !popup) return;
     document.addEventListener('keydown', hideAstPopupOnAltX);
     document.addEventListener('pointerdown', hideAstPopupOnOutsideClick);
 
@@ -420,11 +378,7 @@ async function main() {
     popup.style.opacity = '1';
   }
 
-  /**
-   * Event handler function for hiding ast-popup on pressing Alt+X on Keyboard.
-   * @param {Event} e - Event triggered by key-down.
-   */
-  function hideAstPopupOnAltX(e) {
+  function hideAstPopupOnAltX(e: KeyboardEvent): void {
     if (e.altKey && e.key === 'x') { // Esc key didn't work well due to telegram's predefined shortcuts.
       e.preventDefault();
       e.stopPropagation();
@@ -432,152 +386,96 @@ async function main() {
     }
   }
 
-  /**
-   * Event handler function for hiding ast-popup on clicking anywhere outside the popup.
-   * @param {Event} e - Event triggered by mouse/pointer-down.
-   */
-  function hideAstPopupOnOutsideClick(e) {
-    if (!popup.contains(e.target) && (e.target !== uploadTag)) {
+  function hideAstPopupOnOutsideClick(e: PointerEvent): void {
+    if (!popup) return;
+    if (!popup.contains(e.target as Element) && (e.target !== uploadTag)) {
       hideAstPopup();
     }
   }
 
   //-------------------- Message set handling --------------------
-  /**
-   * Sets required parameters for selecting a message set.
-   ** Ensure 'selectTag' element and 'selectedMsgSetId' variable are defined before calling this function.
-   * @param {string} msgSetId - ID of the message set to be seleted.
-   */
-  function selectMsgSet(msgSetId) {
+  //* Ensure 'selectTag' element and 'selectedMsgSetId' variable are defined before calling this function.
+  function selectMsgSet(msgSetId: string): void {
+    if (!selectTag) return;
     selectedMsgSetId = msgSetId;
     selectTag.value = selectedMsgSetId;
     selectTag.dispatchEvent(changeEvent);
   }
 
-  /**
-   * Set required parameters to previously selected message set.
-   * Use: to revert selectTag.value when it is changed but selecteMsgSetId is not changed yet.
-   ** Ensure 'selectTag' element and 'selectedMsgSetId' variable are defined before calling this function.
-   */
-  function setPreviouslySelectedMsgSet() {
+  //* Ensure 'selectTag' element and 'selectedMsgSetId' variable are defined before calling this function.
+  function setPreviouslySelectedMsgSet(): void {
     selectMsgSet(selectedMsgSetId);
   }
 
-  /**
-   * Get the message set option tag of the provided message set ID.
-   * @param {string} msgSetId - ID of the message set to get tag of.
-   * @returns {HTMLElement | null} - HTML option tag with provided msgSetId as value, or 'null' if not found.
-   */
-  function getSelectedMsgSetTag(msgSetId) {
-    return document.querySelector(`[value="${msgSetId}"]`);
+  //* Ensure 'selectedMsgSetId' variable is defined before calling this function.
+  function getSelectedMsgSetTag(msgSetId: string): HTMLElement | null {
+    return document.querySelector(`[value="${msgSetId}"]`) as HTMLElement || null;
   }
 
-  /**
-   * Use: to check if user has selected a message set or not.
-   ** Ensure 'selectedMsgSetId' variable is defined before calling this function.
-   * @returns {boolean} - true if selected, else false.
-   */
-  function isAMsgSetSelected() {
-    return getSelectedMsgSetTag(selectedMsgSetId)?.parentElement.id === 'ast-user-sets-optgroup';
+  //* Ensure 'selectedMsgSetId' variable is defined before calling this function.
+  function isAMsgSetSelected(): boolean {
+    const selectedElement = getSelectedMsgSetTag(selectedMsgSetId);
+    return selectedElement !== null && selectedElement.parentElement?.id === 'ast-user-sets-optgroup';
   }
 
-  /**
-   * Gets the message set with the provided ID from the message sets defined in `msgSets`.
-   ** Ensure 'msgSets' array is defined before calling this function.
-   * @param {string} msgSetId - The ID of the message set to get/find.
-   * @returns {object | null} - The desired message set, or `null` if not found.
-   */
-  function getMsgSet(msgSetId) {
+  //* Ensure 'msgSets' array is defined before calling this function.
+  function getMsgSet(msgSetId: string): MessageSet | undefined {
     return msgSets.find((msgSet => msgSet.id === msgSetId));
   }
 
-  /**
-   * Saves and overwrites previously stored message sets in localStorage.
-   ** Ensure 'msgSets' array is defined before calling this function.
-   */
-  function saveMsgSetsToLocalStorage() {
+  //* Ensure 'msgSets' array is defined before calling this function.
+  function saveMsgSetsToLocalStorage(): void {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(msgSets));
   }
 
-  //-------------------- etc --------------------
-  /**
-   * Gets the value of 'from' time-input element.
-   * Use: to send messages from this time onwards (messages with their schedule time after this from-time).
-   ** Ensure 'fromInputTag' element is defined before calling this function.
-   * @returns {string} - The time selected by the user in "HH:MM" format, or an empty string if not selected.
-   */
-  function getAstFromTimeInputValue() {
+  //-------------------- 'from' time-input --------------------
+  function getAstFromTimeInputValue(): string | undefined {
+    if (!fromInputTag) return;
     return fromInputTag.value;
   }
 
   //==================== Functions for loadLocalMsgs ====================
-  /**
-   * Creates an option tag with value set as msgSetId and innerText set as msgSetName
-   * @param {string} msgSetId - ID of the message set.
-   * @param {string} msgSetName - Name of the message set.
-   * @returns {HTMLElement} - The generated 'option' tag.
-   */
-  function createMsgSetOptionTag(msgSetId, msgSetName) {
+  function createMsgSetOptionTag(msgSetId: string, msgSetName: string): HTMLOptionElement {
     const newOptionTag = document.createElement('option');
     newOptionTag.value = msgSetId;
     newOptionTag.innerText = msgSetName;
     return newOptionTag;
   }
 
-  /**
-   * Loads the message set in the DOM.
-   ** Ensure that 'msgSets' array and 'userUploadOptionGroup' element is defined before calling this function.
-   * @param {object} msgSet - The message set object containing id, name, msgs parameters.
-   * @param {string} msgSet.id - ID of the message set.
-   * @param {string} msgSet.name - Name of the message set.
-   * @param {object[]} msgSet.msgs - Array of message objects containing information about the messages.
-   */
-  function loadMsgSetToDOM(msgSet) {
+  //* Ensure that 'msgSets' array and 'userUploadOptionGroup' element is defined before calling this function.
+  function loadMsgSetToDOM(msgSet: MessageSet): void {
+    if (!userUploadOptionGroup) return;
     msgSets.push(msgSet);
     userUploadOptionGroup.append(createMsgSetOptionTag(msgSet.id, msgSet.name));
   }
 
   //==================== Functions for handleSelectChange ====================
-
-  /**
-   * Hides all ast-error-messages in DOM.
-   */
-  function hideAllErrors() {
-    [...document.querySelectorAll('.ast-error-message')].map(hideMessage);
+  function hideAllErrors(): void {
+    [...document.querySelectorAll('.ast-error-message')].map(errTag => hideMessage(errTag as HTMLElement));
   }
 
-  /**
-   * Hides all ast-warning-messages in DOM.
-   */
-  function hideAllWarnings() {
-    [...document.querySelectorAll('.ast-warning-message')].map(hideMessage);
+  function hideAllWarnings(): void {
+    [...document.querySelectorAll('.ast-warning-message')].map(warnTag => hideMessage(warnTag as HTMLElement));
   }
 
-  /**
-   * Triggers click() on uploadTag and selects previously selected message set in case upload is canceled.
-   ** Ensure that 'uploadTag' element is defined and requirements of 'setPreviouslySelectedMsgSet()' function are satisfied before calling this function.
-   */
-  function triggerUpload() {
+  //* Ensure that 'uploadTag' element is defined and requirements of 'setPreviouslySelectedMsgSet()' function are satisfied before calling this function.
+  function triggerUpload(): void {
+    if (!uploadTag) return;
     setPreviouslySelectedMsgSet(); // in case upload cancels for any reason.
     uploadTag.click()
   }
 
-  /**
-   * Remove all previews from the DOM.
-   ** Ensure that 'previewContainerDiv' element is defined before calling this function.
-   */
-  function removePreviews() {
+  //* Ensure that 'previewContainerDiv' element is defined before calling this function.
+  function removePreviews(): void {
+    if (!previewContainerDiv) return;
     const previews = [...document.getElementsByClassName('ast-preview-item')];
     previews.forEach(preview => preview.remove());
     previewContainerDiv.style.display = 'none';
   }
 
-  /**
-   * Removes all user uploaded message sets from DOM and localStorage.
-   ** Ensure that 'userUploadOptionGroup' element and 'LOCAL_STORAGE_KEY' is defined and requirements of 'setPreviouslySelectedMsgSet()' and 'selectMsgSet()' functions are met before calling this function.
-   * @returns {void} - Returns if deletion is canceled.
-   */
-  function clearUserSets() {
+  //* Ensure that 'userUploadOptionGroup' element and 'LOCAL_STORAGE_KEY' is defined and requirements of 'setPreviouslySelectedMsgSet()' and 'selectMsgSet()' functions are met before calling this function.
+  function clearUserSets(): void {
+    if (!userUploadOptionGroup) return
     setPreviouslySelectedMsgSet(); // in case deletion cancels for any reason.
     if (!confirm("This will delete all your uploaded message sets! Confirm delete?")) return;
 
@@ -587,12 +485,8 @@ async function main() {
     removePreviews();
   }
 
-  /**
-   * Assigns row numbers to messages inside a message set.
-   * @param {object} msgSet - The message set object to assign row numbers to.
-   */
-  function assignRowNoToMsgs(msgSet) {
-    const tempMsgs = []
+  function assignRowNoToMsgs(msgSet: MessageSet) {
+    const tempMsgs: Messages = [];
     msgSet.msgs.forEach((msg, index) => {
       tempMsgs.push({ ...msg, rowNo: index + 1 });
     })
@@ -600,63 +494,42 @@ async function main() {
   }
 
   //-------------------- Show previews functions --------------------
-  /**
-   * Creates and appends message rows to preview div in DOM.
-   ** Ensure 'previewDiv' element is defined before calling this function.
-   * @param {object} msg - The message object from a message set's array of message objects.
-   * @param {string | number} msg.rowNo - Row number of the message.
-   * @param {string | number} msg.hh - Hour value of the message.
-   * @param {string | number} msg.mm - Minute value of the message.
-   * @param {string} msg.msg - Text of the message.
-   * @param {boolean} msg.isMsgLate - true if message is late (message's schedule time is before current time), else false.
-   */
-  function renderPreviewRow(msg) {
+  //* Ensure 'previewDiv' element is defined before calling this function.
+  function renderPreviewRow(msg: Message) {
+    if (!previewDiv || !msg.rowNo || (typeof msg.isMsgLate === 'undefined')) return;
     const rowNoSpan = createPreviewTag(msg.rowNo, msg.rowNo, 'row', 'span', msg.isMsgLate);
     const hrsInput = createPreviewTag(msg.rowNo, msg.hh, 'hh', 'input', msg.isMsgLate);
     const minInput = createPreviewTag(msg.rowNo, msg.mm, 'mm', 'input', msg.isMsgLate);
-    const msgInput = createPreviewTag(msg.rowNo, msg.msg, 'msg', 'input', msg.isMsgLate);
+    const msgInput = createPreviewTag(msg.rowNo, msg.txt, 'txt', 'input', msg.isMsgLate);
 
     previewDiv.append(rowNoSpan, hrsInput, minInput, msgInput);
   }
 
-  /**
-   * Creates an HTMLElement/Tag for message previews.
-   * @param {string | number} rowNo - Row number of the message.
-   * @param {string | number} value - Value to be placed in innerText or value property.
-   * @param {'row' | 'hh' | 'mm' | 'msg'} dataType - Type of data for the tag ('row', 'hh', 'mm', or 'msg').
-   * @param {string} tagName - HTMLElement/Tag name.
-   * @param {boolean} isMsgLate - true if message is late (message's schedule time is before current time), else false.
-   * @returns {HTMLElement} - The HTMLElement/Tag generated.
-   */
-  function createPreviewTag(rowNo, value, dataType, tagName, isMsgLate) {
-    const tag = document.createElement(tagName);
+  function createPreviewTag(rowNo: string | number, value: string | number, dataType: PreviewMessageProperties, tagName: string, isMsgLate: boolean): HTMLInputElement | HTMLSpanElement {
+    const tag: HTMLInputElement | HTMLSpanElement = document.createElement(tagName);
     tag.className = `ast-preview-item ast-preview-row-${rowNo} ast-preview-item-${dataType} ${isMsgLate ? 'late-message-preview' : ''}`;
-    if (tagName === 'input') {
+    if (tagName === 'input' && tag instanceof HTMLInputElement) {
       tag.type = 'text';
-      tag.value = value;
+      tag.value = `${value}`;
       tag.onchange = handlePreviewEdit;
     }
     else {
-      tag.innerText = value;
+      tag.innerText = `${value}`;
     }
     return tag;
   }
 
-  /**
-   * Shows messages for preview/edit on the DOM, and also highlights late messages.
-   ** Ensure 'previewWarningTag', 'previewHeading' elements are defined and requirements for 'isAMsgSetSelected()', 'removePreviews()', 'getAstFromTimeInputValue()' and 'renderPreviewRow()' are met before calling this function.
-   * @param {object[]} msgs - Array of message objects containing information about messages.
-   * @param {string | number} msgs.msg.rowNo - Array of message objects containing information about messages.
-   * @returns {void} - returns if a message set is not selected by the user.
-   */
-  function showPreviews(msgs) {
+  //* Ensure 'previewWarningTag', 'previewHeading' elements are defined and requirements for 'isAMsgSetSelected()', 'removePreviews()', 'getAstFromTimeInputValue()' and 'renderPreviewRow()' are met before calling this function.
+  function showPreviews(msgs: Messages): void {
+    if (!previewWarningTag || !previewHeading || !previewContainerDiv) return;
     if (!isAMsgSetSelected()) return;
 
     removePreviews();
-    const lateMsgsRowNumbers = []
+    const lateMsgsRowNumbers: (number | string)[] = []
     const fromInputValue = getAstFromTimeInputValue();
 
     msgs.map(msg => {
+      if (!msg.rowNo) return;
       const isMsgLate = isMsgOlderThanCurrentTime(msg);
       if (isMsgLate) lateMsgsRowNumbers.push(msg.rowNo);
       renderPreviewRow({ ...msg, isMsgLate });
@@ -669,54 +542,32 @@ async function main() {
   }
 
   //==================== Functions for handleUploadChange ====================
-
-  /**
- * Reads a file as text asynchronously using FileReader.
- * @param {File} file - The File object to read.
- * @returns {Promise<string>} - A Promise that resolves with the file's text content when successfully read. Rejects with an error if reading fails.
- */
-  function readFileAsText(file) {
+  function readFileAsText(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
       reader.onerror = () => reject(reader.error);
       reader.readAsText(file);
     });
   }
 
-  /**
-   * Checks if all the messages of an array of message objects has required parameters or not
-   * @param {object[]} msgs - Array of message objects.
-   * @returns {boolean} - true if all messages have required properties 'hh', 'mm', 'msg', else false.
-   */
-  function msgsHasRequiredProperties(msgs) {
-    for (msg of msgs) {
-      if (!msg.mm || !msg.hh || !msg.msg) return false;
+  function msgsHasRequiredProperties(msgs: Messages): boolean {
+    for (let msg of msgs) {
+      if (!msg.mm || !msg.hh || !msg.txt) return false;
     }
     return true;
   }
 
-  /**
-   * Creates a new message set.
-   * @param {string} fileName - Name of the message set to be created.
-   * @param {object[]} msgs - Array of message object containing information about the messages.
-   * @returns {object} - The generated message set object.
-   */
-  function createMsgSet(fileName, msgs) {
+  function createMsgSet(fileName: string, msgs: Messages): MessageSet {
     const currentDate = new Date();
     return {
-      "id": fileName + ' ' + String(currentDate),
-      "name": fileName,
-      "msgs": msgs
+      id: `fileName ${currentDate}`,
+      name: fileName,
+      msgs: msgs
     }
   }
 
-  /**
-   * Extract the name without extension of the provided file.
-   * @param {File} file - File object
-   * @returns {string} - Name of the file
-   */
-  function extractNameFromFile(file) {
+  function extractNameFromFile(file: File): string {
     const nameParts = file.name.split('.');
     if (nameParts.length > 1) {
       nameParts.pop(); // Remove the last element (the extension)
@@ -726,13 +577,8 @@ async function main() {
   }
 
   //==================== Functions for handleDelete ====================
-
-  /**
-   * Removes a message set from 'msgSets' array.
-   ** Ensure that 'msgSets' array is defined before calling this function.
-   * @param {string} msgSetId - ID of the message set to be removed.
-   */
-  function removeFromMsgSets(msgSetId) {
+  //* Ensure that 'msgSets' array is defined before calling this function.
+  function removeFromMsgSets(msgSetId: string) {
     const index = msgSets.findIndex(msgSet => msgSet.id === msgSetId);
     if (index === -1) throw new Error('Message set not found');
     msgSets.splice(index, 1);
@@ -740,32 +586,17 @@ async function main() {
 
   //==================== Functions for handleConfirm. ====================
   //-------------------- Preview data to JSON conversion functions --------------------
-
-  /**
-   * Gets an array of row numbers of all row preview items in the DOM.
-   * @returns {string[] | number[]} - Array of row numbers of preview items.
-   */
-  function getPreviewItemsRowNumbers() {
-    return [...document.querySelectorAll('.ast-preview-item-row')].map(item => item.innerText);
+  function getPreviewItemsRowNumbers(): string[] | number[] {
+    return [...document.querySelectorAll('.ast-preview-item-row')].map((item: Element) => (item as HTMLElement).innerText);
   }
 
-  /**
-   * Gets value of the provided preview item on the provided row.
-   * @param {string | number} rowNo - Row number of the preview item.
-   * @param {'hh' | 'mm' | 'msg'} dataType - Data type of the preview item to get value from.
-   * @returns {string} - Value of the required item, or an empty string if the item is not found.
-   */
-  function getPreviewValue(rowNo, dataType) {
-    const element = document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-${dataType}`);
+  function getPreviewValue(rowNo: string | number, dataType: PreviewInputDataType): string {
+    const element = document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-${dataType}`) as HTMLInputElement;
     return element ? element.value : '';
   }
 
-  /**
-   * Gets all the data from preview and returns it in a JSON format (i.e. same format as 'msgs' array of message objects).
-   * @returns {object[]} - Array of message objects.
-   */
-  function previewDataToJson() {
-    const newData = [];
+  function previewDataToJson(): Messages {
+    const newData: Messages = [];
     if (!document.querySelector('.ast-preview-item')) return newData; // return an empty array if there is no preview data
 
     getPreviewItemsRowNumbers().forEach(rowNo => {
@@ -773,72 +604,51 @@ async function main() {
         rowNo: rowNo,
         hh: getPreviewValue(rowNo, 'hh'),
         mm: getPreviewValue(rowNo, 'mm'),
-        msg: getPreviewValue(rowNo, 'msg'),
+        txt: getPreviewValue(rowNo, 'txt'),
       })
     })
     return newData;
   }
 
   //-------------------- Validate message and highlight error functions --------------------
-
-  /**
-   * Checks wether the string contains only numbers/digits or not.
-   * @param {string} str - String to check.
-   * @returns {boolean} - true if it's a string of numbers, else false.
-   */
-  function isNum(str) {
+  function isNum(str: string | number): boolean {
     return /^\d+$/.test(`${str}`);
   }
 
-  /**
-   * Resets the borders of preview items for a given row number to the default style.
-   * @param {number} rowNo - The row number whose preview item borders need to be reset.
-   */
-  function resetPreviewItemBorders(rowNo) {
+  function resetPreviewItemBorders(rowNo: string | number): void {
     [...document.querySelectorAll(`.ast-preview-row-${rowNo}:not(.ast-preview-item-row)`)].forEach(previewItem => {
-      previewItem.style.border = '1px solid grey';
-      previewItem.style.borderRadius = '3px';
+      (previewItem as HTMLElement).style.border = '1px solid grey';
+      (previewItem as HTMLElement).style.borderRadius = '3px';
     })
   }
 
-  /**
-   * Sets the border style to indicate an incorrect value for a specific data type in a given row.
-   * @param {number} rowNo - The row number containing the incorrect value.
-   * @param {string} dataType - The type of data that is incorrect (e.g., 'hh', 'mm' or 'msg').
-   */
-  function setBorderForIncorrectValue(rowNo, dataType) {
-    const tempPreviewTag = document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-${dataType}`);
+  function setBorderForIncorrectValue(rowNo: string | number, dataType: PreviewInputDataType): void {
+    const tempPreviewTag = document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-${dataType}`) as HTMLElement;
     tempPreviewTag.style.border = '2px solid red';
     tempPreviewTag.style.borderRadius = '3px';
   }
 
-  /**
-   * Sets the backgroundColor style of a preview row item to indicate late message.
-   * @param {number} rowNo - The row number containing the late message.
-   */
-  function setBgForOldMsg(rowNo) {
-    document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-row`).style.backgroundColor = 'orange';
+  function setBgForOldMsg(rowNo: string | number): void {
+    (document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-row`) as HTMLElement).style.backgroundColor = 'orange';
   }
 
-  /**
-   * Resets the backgroundColor style of a preview row item to default.
-   * @param {number} rowNo - The row number whose preview item borders need to be reset.
-   */
-  function resetBgForPreviewRowNo(rowNo) {
-    document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-row`).style.backgroundColor = 'transparent';
+  function resetBgForPreviewRowNo(rowNo: string | number) {
+    (document.querySelector(`.ast-preview-row-${rowNo}.ast-preview-item-row`) as HTMLElement).style.backgroundColor = 'transparent';
   }
 
-  /**
-   * Checks and highlights error and late messages.
-   ** Ensure 'previewWarningTag' and 'previewErrorTag' elements are defined before calling this function.
-   * @param {object[]} msgs - Array of message objects.
-   * @returns {boolean} - true if no errors are found, else false.
-   */
-  function validateData(msgs) {
-    const errors = [];
-    const errorRows = [];
-    const lateMsgsRowNumbers = [];
+  function validateData(msgs: Messages) {
+    if (!previewWarningTag || !previewErrorTag) return;
+    type ErrorMsgs = string[]
+    interface ErrorRow {
+      rowNo: string | number,
+      errors: ErrorMsgs,
+      data: Message
+    };
+    const errors: ErrorRow[] = [];
+    const errorRows: (string | number)[] = [];
+    const lateMsgsRowNumbers: (string | number)[] = [];
     msgs.forEach(msg => {
+      if (msg.rowNo === undefined) return;
       // Check for late message
       if (isMsgOlderThanCurrentTime(msg)) {
         lateMsgsRowNumbers.push(msg.rowNo);
@@ -849,16 +659,16 @@ async function main() {
       }
 
       // Check for incorrect values
-      const invalidHr = (!isNum(`${msg.hh}`) || parseInt(msg.hh) < 0 || parseInt(msg.hh) > 23);
-      const invalidMin = (!isNum(`${msg.mm}`) || parseInt(msg.mm) < 0 || parseInt(msg.mm) > 59);
-      const invalidMsg = (typeof msg.msg !== 'string');
+      const invalidHr = (!isNum(`${msg.hh}`) || parseInt(`${msg.hh}`) < 0 || parseInt(`${msg.hh}`) > 23);
+      const invalidMin = (!isNum(`${msg.mm}`) || parseInt(`${msg.mm}`) < 0 || parseInt(`${msg.mm}`) > 59);
+      const invalidMsg = (typeof msg.txt !== 'string');
 
       if (!invalidHr && !invalidMin && !invalidMsg) { resetPreviewItemBorders(msg.rowNo); return; }
 
-      const errorMessages = [];
+      const errorMessages: ErrorMsgs = [];
       if (invalidHr) { setBorderForIncorrectValue(msg.rowNo, 'hh'); errorMessages.push('Invalid hour'); }
       if (invalidMin) { setBorderForIncorrectValue(msg.rowNo, 'mm'); errorMessages.push('Invalid minute'); }
-      if (invalidMsg) { setBorderForIncorrectValue(msg.rowNo, 'msg'); errorMessages.push('Invalid message'); }
+      if (invalidMsg) { setBorderForIncorrectValue(msg.rowNo, 'txt'); errorMessages.push('Invalid message'); }
 
       errors.push({ 'rowNo': msg.rowNo, 'errors': errorMessages, 'data': msg });
       errorRows.push(msg.rowNo);
@@ -877,97 +687,50 @@ async function main() {
   }
 
   //-------------------- Schedule message functions --------------------
-
-  /**
-   * Checks wether the given message object's time is before the current time.
-   * @param {object} msg - A message object.
-   * @param {string | number} msg.hh - Hour value of the message object.
-   * @param {string | number} msg.mm - Minute value of the message object.
-   * @param {string} msg.msg - Text of the message object.
-   * @returns {boolean} - true if message is old, else false.
-   */
-  function isMsgOlderThanCurrentTime(msg) {
+  function isMsgOlderThanCurrentTime(msg: Message): boolean {
     const currentTime = new Date();
     const curHrs = currentTime.getHours();
     const curMin = currentTime.getMinutes();
-    const msgHrs = parseInt(msg.hh);
-    const msgMin = parseInt(msg.mm);
+    const msgHrs = parseInt(`${msg.hh}`);
+    const msgMin = parseInt(`${msg.mm}`);
     return (msgHrs < curHrs || ((msgHrs === curHrs) && (msgMin < curMin)));
   }
 
-  /**
-   * Checks wether the given message object's time is not before the current time.
-   * @param {object} msg - A message object.
-   * @param {string | number} msg.hh - Hour value of the message object.
-   * @param {string | number} msg.mm - Minute value of the message object.
-   * @param {string} msg.msg - Text of the message object.
-   * @returns {boolean} - true if message is not old, else false.
-   */
-  function isMsgNotOlderThanCurrentTime(msg) {
+  function isMsgNotOlderThanCurrentTime(msg: Message): boolean {
     return !isMsgOlderThanCurrentTime(msg);
   }
 
-  /**
-   * Simulates 'Escape' key press on document.body.
-   ** Ensure that pressEscapeEvent is defined before calling this function.
-   */
-  function pressEscape() {
+  //* Ensure that pressEscapeEvent is defined before calling this function.
+  function pressEscape(): void {
     document.body.dispatchEvent(pressEscapeEvent);
   }
 
-  /**
-   * Simulates 'Enter' key press on document.body.
-   ** Ensure that pressEnterEvent is defined before calling this function.
-   */
-  function pressEnter() {
+  //* Ensure that pressEnterEvent is defined before calling this function.
+  function pressEnter(): void {
     document.body.dispatchEvent(pressEnterEvent);
   }
 
-  /**
-   * Gets telegram's time input tags in an HTMLElement array. 
-   * Element at index 0 is for hours, and at index 1 is for minutes. Change their value property. 
-   * @returns {HTMLElement[]} - Array of HTML elements containing time input tags.
-   */
-  function getTeleScheduleTimeInputs() {
-    return [...document.querySelectorAll('.date-picker-time > .input-field > .input-field-input')];
+  function getTeleScheduleTimeInputs(): HTMLInputElement[] {
+    return [...document.querySelectorAll('.date-picker-time > .input-field > .input-field-input')].map(element => element as HTMLInputElement);
   }
 
-  /**
-   * Enters the message into telegram's text input for messages.
-   * @param {string} msg - Text value for the message.* 
-   */
-  function enterMsgIntoTeleMsgInputs(msg) {
+  function enterMsgIntoTeleMsgInputs(msg: string): void {
     const msgInputElements = getTeleMsgInputElements();
     msgInputElements.forEach(msgInput => msgInput.innerText = msg);
   }
 
-  /**
-   * Enters the time for scheduling the message inside telegram's schedule message popup's time inputs.
-   * @param {string | number} hh - Hour value.
-   * @param {string | number} mm - Minute value.
-   */
-  function enterTimeIntoTeleScheduleTimeInputs(hh, mm) {
+  function enterTimeIntoTeleScheduleTimeInputs(hh: string | number, mm: string | number) {
     const timeInputElements = getTeleScheduleTimeInputs();
-    timeInputElements[0].value = hh;
-    timeInputElements[1].value = mm;
+    timeInputElements[0].value = `${hh}`;
+    timeInputElements[1].value = `${mm}`;
   }
 
-  /**
-   * Pauses execution for a specified number of milliseconds. 
-   ** Make sure to use it with await in an async function.
-   * @param {number} ms - The number of milliseconds to sleep.
-   * @returns {Promise<void>} A promise that resolves after the specified delay.
-   */
-  function sleep(ms) {
+  //* Make sure to use it with await in an async function.
+  function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  /**
-   * Schedules the messages from provided array of message objects.
-   * @param {object[]} msgs - Array of message objects.
-   * @returns {void} - Returns if a telegram chat's schedule messages section is not open.
-   */
-  async function scheduleMsgs(msgs) {
+  async function scheduleMsgs(msgs: Messages): Promise<void> {
     // Rechecking here in-case user pressed Esc while popup was open to get out of chat.
     if (!getTeleActiveChatElement()) { alert('Open a telegram chat first!'); return; }
     if (!isTeleScheduleChatSectionOpen()) { alert('Open the schedule messages section of this chat first!'); return; }
@@ -975,7 +738,7 @@ async function main() {
 
     // Check if telegram's schedule time input popup is already open (press Escape to close it if it's open)
     if (getTeleSchedulerPopupElement()) { pressEscape(); await sleep(DELAY); }
-    for (msg of msgs) {
+    for (let msg of msgs) {
       if (!continueExecutionFlag) {
         console.log('Execution stopped by user at message:\n', msg);
         document.removeEventListener('keydown', haltExecution);
@@ -983,7 +746,7 @@ async function main() {
         return;
       }
       if (isMsgOlderThanCurrentTime(msg)) continue;
-      enterMsgIntoTeleMsgInputs(msg.msg);
+      enterMsgIntoTeleMsgInputs(msg.txt);
       pressEnter();
       await sleep(DELAY);
       enterTimeIntoTeleScheduleTimeInputs(msg.hh, msg.mm);
@@ -993,77 +756,64 @@ async function main() {
   }
 
   //==================== Main functions ====================
+  //* Ensure 'userUploadOptionGroup' element and 'LOCAL_STORAGE_KEY' variable are defined and requirements for 'loadMsgSetToDOM' are met before calling this function.
+  function loadLocalMsgSets(): void {
+    if (!userUploadOptionGroup || userUploadOptionGroup.childElementCount > 0) return; // Checks if msgSets are already loaded!
+    const localMsgSetsString = localStorage.getItem(LOCAL_STORAGE_KEY); // Gets the local message sets string.
+    if (!localMsgSetsString) return;
 
-  /**
-   * Loads message sets stored in localStorage to DOM.
-   ** Ensure 'userUploadOptionGroup' element and 'LOCAL_STORAGE_KEY' variable are defined and requirements for 'loadMsgSetToDOM' are met before calling this function.
-   * @returns {void} - Returns if messages are already loaded from localStorage
-   */
-  function loadLocalMsgSets() {
-    if (userUploadOptionGroup.childElementCount > 0) return; // Checks if msgSets are already loaded!
-    const localMsgSets = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)); // Gets the local message sets.
-    if (localMsgSets) localMsgSets.map(loadMsgSetToDOM);
+    const localMsgSets = JSON.parse(localMsgSetsString);
+    localMsgSets.map(loadMsgSetToDOM);
   }
 
-  /**
-   * Event handler function for handling change in 'from time-input'.
-   ** Ensure that requirements for 'showPreviews()' function are met before calling this function.
-   * @param {Event} e - Event object triggered by change in 'from time-input'.
-   * @returns {void} - Returns if a message set is not selected by user.
-   */
-  function handleAstFromTimeInputChange(e) {
+  //* Ensure that requirements for 'showPreviews()' function are met before calling this function.
+  function handleAstFromTimeInputChange(e: Event): void {
+    if (!selectedMsgSet) return;
     if (!isAMsgSetSelected()) return;
-    const tempFromTime = e.target.value.split(':');
+    const tempFromTime = (e.target as HTMLInputElement).value.split(':');
     const fromHr = Number.parseInt(tempFromTime[0]);
     const fromMin = Number.parseInt(tempFromTime[1]);
     const tempMsgs = selectedMsgSet.msgs.filter(msg => (
-      parseInt(msg.hh) > fromHr || (parseInt(msg.hh) === fromHr && parseInt(msg.mm) >= fromMin)
+      parseInt(`${msg.hh}`) > fromHr || (parseInt(`${msg.hh}`) === fromHr && parseInt(`${msg.mm}`) >= fromMin)
     )); // Getting messages which are to be scheduled after user's desired from-input time.
     showPreviews(tempMsgs);
   }
 
-  /**
-   * Event handler for change in select when user selects a new option.
-   ** Ensure that requirements for 'triggerUpload()', 'clearUserSets()', 'removePreviews()', 'getMsgSet()', 'showPreviews()' and 'getAstFromTimeInputValue()' are met and 'DEFAULT_OPTION_ID', 'selectedMsgSetId', 'selectedMsgSet', 'fromInputTag' and 'changeEvent' are defined before calling this function.
-   * @param {Event} e - Event object triggered by the selecting an option.
-   */
-  function handleSelectChange(e) {
+  //* Ensure that requirements for 'triggerUpload()', 'clearUserSets()', 'removePreviews()', 'getMsgSet()', 'showPreviews()' and 'getAstFromTimeInputValue()' are met and 'DEFAULT_OPTION_ID', 'selectedMsgSetId', 'selectedMsgSet', 'fromInputTag' and 'changeEvent' are defined before calling this function.
+  function handleSelectChange(e: Event): void {
     //! WARNING: using selectMsgSet() here may cause an infinite loop.
+    if (!e.target) return;
     hideAllErrors();
     hideAllWarnings();
-    if (e.target.value === 'upload_new_set') triggerUpload();
-    else if (e.target.value === 'clear_user_sets') clearUserSets();
-    else if (e.target.value === DEFAULT_OPTION_ID) {
-      selectedMsgSetId = e.target.value;
+    const tempTarget = e.target as HTMLSelectElement;
+    if (tempTarget.value === 'upload_new_set') triggerUpload();
+    else if (tempTarget.value === 'clear_user_sets') clearUserSets();
+    else if (tempTarget.value === DEFAULT_OPTION_ID) {
+      selectedMsgSetId = tempTarget.value;
       selectedMsgSet = null;
       removePreviews();
     }
     else {
-      selectedMsgSetId = e.target.value;
-      selectedMsgSet = getMsgSet(selectedMsgSetId);
+      selectedMsgSetId = tempTarget.value;
+      selectedMsgSet = getMsgSet(selectedMsgSetId) as MessageSet;
       assignRowNoToMsgs(selectedMsgSet);
       showPreviews(selectedMsgSet.msgs);
     }
-    if (getAstFromTimeInputValue()) fromInputTag.dispatchEvent(changeEvent);
+    if (fromInputTag && getAstFromTimeInputValue()) fromInputTag.dispatchEvent(changeEvent);
   }
 
-  /**
-   * Handles the file upload change event, reads the file, and processes its content.
-   ** Ensure that requirements for 'loadMsgSetToDOM()', 'saveMsgSetsToLocalStorage()', 'selectMsgSet()', 'selectPreviouslySelectedMsgSet()' are met and 'fileInputErrorTag' element is defined before calling this function.
-   * @param {Event} e - The change event triggered by the file input.
-   * @returns {Promise<void>} - A promise that resolves when the file is successfully processed.
-   * @throws {Error} - Throws an error if no file is selected, the file type is not JSON, the file content is invalid, or other processing errors occur.
-   */
-  async function handleUploadChange(e) {
+  //* Ensure that requirements for 'loadMsgSetToDOM()', 'saveMsgSetsToLocalStorage()', 'selectMsgSet()', 'selectPreviouslySelectedMsgSet()' are met and 'fileInputErrorTag' element is defined before calling this function.
+  async function handleUploadChange(e: Event): Promise<void> {
+    if (!fileInputErrorTag || !(e.target instanceof HTMLInputElement)) return;
     try {
       hideMessage(fileInputErrorTag);
 
-      const file = e.target.files[0];
+      const file = e.target.files?.[0];
       if (!file) throw new Error('No files were selected');
       if (file.type !== 'application/json') throw new Error('Wrong type of file. \nAccepted file types: .json');
 
       const fileContent = await readFileAsText(file);
-      const msgs = JSON.parse(fileContent);
+      const msgs = JSON.parse(fileContent) as Messages;
       if (!msgsHasRequiredProperties(msgs)) throw new Error('Invalid message format');
 
       // Add new message set.
@@ -1073,41 +823,35 @@ async function main() {
       selectMsgSet(msgSet.id);
     }
     catch (error) {
-      showMessage(fileInputErrorTag, error); // Currently not working since setPreviouslySelectedMsgSet triggers change on select tag which hides all errors.
+      showMessage(fileInputErrorTag, `${error}`); // Currently not working since setPreviouslySelectedMsgSet triggers change on select tag which hides all errors.
       alert(error); // So, showing alerts instead.
       setPreviouslySelectedMsgSet();
     }
   }
 
-  /**
-   * Handles the deletion of the selected message set.
-   ** Ensure that requirements for 'isAMsgSetSelected()', 'getMsgSet()', 'getSelectedMsgSetTag()', 'removeFromMsgSets()', 'saveMsgSetsToLocalStorage()', 'selectMsgSet()' are met, 'fileInputErrorTag' element, 'selectedMsgSetId' and 'DEFAULT_OPTION_ID' variables are defined before calling this function.
-   * @param {Event} e - The event object triggered by the delete action.
-   */
-  function handleDeleteSet(e) {
+  //* Ensure that requirements for 'isAMsgSetSelected()', 'getMsgSet()', 'getSelectedMsgSetTag()', 'removeFromMsgSets()', 'saveMsgSetsToLocalStorage()', 'selectMsgSet()' are met, 'fileInputErrorTag' element, 'selectedMsgSetId' and 'DEFAULT_OPTION_ID' variables are defined before calling this function.
+  function handleDeleteSet(e: Event): void {
+    if (!fileInputErrorTag) return;
     e.preventDefault();
     hideMessage(fileInputErrorTag);
     try {
       if (!isAMsgSetSelected()) throw new Error('Select a message set first');
-      if (!confirm(`This will delete the selected message set (${getMsgSet(selectedMsgSetId).name}). Confirm delete?`)) return;
+      if (!confirm(`This will delete the selected message set (${getMsgSet(selectedMsgSetId)?.name}). Confirm delete?`)) return;
       const selectedMsgOptionTag = getSelectedMsgSetTag(selectedMsgSetId);
       removeFromMsgSets(selectedMsgSetId);
       saveMsgSetsToLocalStorage();
       selectMsgSet(DEFAULT_OPTION_ID);
-      selectedMsgOptionTag.remove();
+      selectedMsgOptionTag?.remove();
     }
     catch (error) {
-      showMessage(fileInputErrorTag, error);
+      showMessage(fileInputErrorTag, `${error}`);
     }
   }
 
-  /**
-   * Handles the confirmation of message set.
-   ** Ensure that 'fileInputErrorTag' element is defined and requirements for 'previewDataToJson()', 'getAstFromTimeInputValue()', 'hideAstPopup()', 'scheduleMsgs()' are met before calling this function. 
-   * @param {Event} e - The event object triggered by the confirm action.
-   */
-  async function handleConfirm(e) {
+  //* Ensure that 'fileInputErrorTag' element is defined and requirements for 'previewDataToJson()', 'getAstFromTimeInputValue()', 'hideAstPopup()', 'scheduleMsgs()' are met before calling this function.
+  async function handleConfirm(e: Event): Promise<void> {
     e.preventDefault();
+    if (!fileInputErrorTag) return;
     if (!selectedMsgSet) { showMessage(fileInputErrorTag, 'Error: Select a message set first'); return; }
     const previewMsgs = previewDataToJson();
     if (!validateData(previewMsgs)) return;
@@ -1118,12 +862,8 @@ async function main() {
     scheduleMsgs(msgsToBeSent);
   }
 
-  /**
-   * Stops scheduling of further message. 
-   ** Ensure that 'continueExecutionFlag' variable is defined before calling this function.
-   * @param {Event} e - The event triggered by keypress.
-   */
-  function haltExecution(e) {
+  //* Ensure that 'continueExecutionFlag' variable is defined before calling this function.
+  function haltExecution(e: KeyboardEvent) {
     if (e.altKey && e.key === 'x') {
       continueExecutionFlag = false;
       e.stopPropagation();
@@ -1131,11 +871,7 @@ async function main() {
     }
   }
 
-  /**
-   * Handle change on editing preview messages.
-   ** Ensure that requirements for 'previewDataToJson()' are met before calling this function.
-   */
-  function handlePreviewEdit() {
+  function handlePreviewEdit(): void {
     const tempPreviewMsgs = previewDataToJson();
     validateData(tempPreviewMsgs);
   }
@@ -1150,6 +886,29 @@ async function main() {
     await sleep(1); // 1ms delay for AST to load in DOM before going further. (Required for first run of transitions/animations)
   }
 
+  // Types and Interfaces
+  type MessageProperty = 'hh' | 'mm' | 'txt' | 'isLate' | 'rowNo';
+  type PreviewMessageProperties = 'hh' | 'mm' | 'txt' | 'row';
+  type PreviewInputDataType = 'hh' | 'mm' | 'txt';
+
+  interface Message {
+    hh: string | number,
+    mm: string | number,
+    txt: string,
+    rowNo?: string | number,
+    isMsgLate?: boolean,
+  }
+
+  type Messages = Message[];
+
+  interface MessageSet {
+    readonly id: string,
+    name: string,
+    msgs: Messages
+  }
+
+  type MessageSets = MessageSet[];
+
   // Events
   const changeEvent = new Event('change');
   const pressEnterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
@@ -1159,9 +918,9 @@ async function main() {
   const backdrop = document.getElementById('ast-backdrop');
   const popup = document.getElementById('ast-popup');
   const closeButton = document.getElementById('ast-close-button');
-  const fromInputTag = document.getElementById('ast-from-input');
+  const fromInputTag: HTMLInputElement | null = document.getElementById('ast-from-input') as HTMLInputElement | null;
   const uploadTag = document.getElementById('ast-file-input');
-  const selectTag = document.getElementById('ast-message-set-select');
+  const selectTag: HTMLSelectElement | null = document.getElementById('ast-message-set-select') as HTMLSelectElement | null;
   const userUploadOptionGroup = document.getElementById('ast-user-sets-optgroup');
   const deleteSetButton = document.getElementById('ast-delete-selected-set-button');
   const previewContainerDiv = document.getElementById('ast-preview-msgs-container');
@@ -1172,29 +931,29 @@ async function main() {
   const previewErrorTag = document.getElementById('ast-preview-msgs-error');
   const previewWarningTag = document.getElementById('ast-preview-msgs-warning');
 
-  if (!firstRun) { firstRun = false; showAstPopup(); return; }
-
-  // Below values must not be redefined/initialized once the popup is already loaded inside the DOM (will break the code).
+  if (!firstRun) { firstRun = false; showAstPopup(); return; } // Below values must not be redefined/initialized once the popup is already loaded inside the DOM (will break the code).
 
   // Constants and Variables
   const LOCAL_STORAGE_KEY = 'astMessageSets';
   const DEFAULT_OPTION_ID = 'This_value_is_for_this_SelectAnOption_Option_TryingToMakeThisUnique'
   const DELAY = 500; // delay between pressing enter and entering next message/time.
-  const msgSets = []; // to store message sets from local storage
+
+  const msgSets: MessageSets = []; // to store message sets from local storage
   let selectedMsgSetId = DEFAULT_OPTION_ID; // for keeping track of selected msg set
-  let selectedMsgSet = null; // set -> jsObject.
+  let selectedMsgSet: MessageSet | null = null; // set -> jsObject.
   let continueExecutionFlag = true;
   // let closePopupTransitionTimeout = null; // Didn't work (will try again later).
 
   // Initializing elements
-  selectTag.value = selectedMsgSetId;
-
-  closeButton.onclick = hideAstPopup;
-  fromInputTag.onchange = handleAstFromTimeInputChange;
-  selectTag.onchange = handleSelectChange;
-  uploadTag.onchange = handleUploadChange;
-  deleteSetButton.onclick = handleDeleteSet;
-  confirmButton.onclick = handleConfirm;
+  if (selectTag) {
+    selectTag.value = selectedMsgSetId;
+    selectTag.onchange = handleSelectChange;
+  }
+  if (closeButton) closeButton.onclick = hideAstPopup;
+  if (fromInputTag) fromInputTag.onchange = handleAstFromTimeInputChange;
+  if (uploadTag) uploadTag.onchange = handleUploadChange;
+  if (deleteSetButton) deleteSetButton.onclick = handleDeleteSet;
+  if (confirmButton) confirmButton.onclick = handleConfirm;
 
   // Start: Load and Open
   loadLocalMsgSets();

@@ -1,0 +1,16 @@
+{
+  "name": "auto-schedule-telegramweb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "start": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "dipeshhhh",
+  "license": "MIT"
+}
